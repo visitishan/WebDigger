@@ -2,30 +2,39 @@
 from bs4 import *
 import requests
 
-# List to stores Links from google search page
+# List to store Links from google search page
 sites = []
-movies = []
+movies = [] #List to store link of movies
 googleallpages = [] # List to store next 9 pages of google search
-
-#File valid extensions (file links should end with these extensions)
-ext = ('mkv','mov','avi','mp4','mpg','wmv')
 
 # Browser Headers
 headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'}
 
-#Name of file to be searched - Search Term
-name = input("Enter a movie name : ")
+#File valid extensions (file links should end with these extensions)
+ext1 = ('mkv','mov','avi','mp4','mpg','wmv')
+ext2 = ('mp3','wav','ac3','ogg','flac','wma','m4a')
+ext3 = ('MOBI','CBZ','CBR','CBC','CHM','EPUB','FB2','LIT','LRF','ODT','PDF','PRC','PDB','PML','RB','RTF','TCR','DOC','DOCX')
+ext4 = ('exe','iso','tar','rar','zip','apk')
+ext5 = ('jpg','png','bmp','gif','tif','tiff','psd')
 
-# URL Prefix
-urlPref = "https://www.google.com/search?q="
 
-# URL Suffix
-urlSuff = "%20%2B(mkv%7Cmp4%7Cavi%7Cmov%7Cmpg%7Cwmv)%20-inurl%3A(jsp%7Cpl%7Cphp%7Chtml%7Caspx%7Chtm%7Ccf%7Cshtml)%20intitle%3Aindex.of%20-inurl%3A(listen77%7Cmp3raid%7Cmp3toss%7Cmp3drug%7Cindex_of%7Cwallywashis)"
+def makeURL(name,filetype):
+	# URL Prefix
+	urlPref = "https://www.google.com/search?q="
+	# URL mid part
+	urlMid = "%20%2B("
+	#File extentions to be searched (concatenating file type presets to url form)
+	FileExt = '%7C'.join(filetype)
+	#URL Suffix
+	urlSuff = ")%20-inurl%3A(jsp%7Cpl%7Cphp%7Chtml%7Caspx%7Chtm%7Ccf%7Cshtml)%20intitle%3Aindex.of%20-inurl%3A(listen77%7Cmp3raid%7Cmp3toss%7Cmp3drug%7Cindex_of%7Cwallywashis)"
+	# complete URL of first search page
+	url1 = urlPref + name + urlMid + FileExt + urlSuff
+	return url1
 
-# complete URL of first search page
-url1 = urlPref + name + urlSuff
 
+#Initializing soup with blank
 soup = ' '
+
 #Function to find and append the websites on a google search page into sites[] list
 def getResLinks(url):
 	# Get URL page data
@@ -79,17 +88,20 @@ def getMovielink(websites):
 				movie = (movielink['href'])
 				milgaya = fullsitelink + movie
 				#if milgaya.endswith(('mkv','mov','avi','mp4','mpg','wmv')) : ----depricated
-				if milgaya.endswith(ext) :
+				if milgaya.endswith(ext1) :
 					if match(milgaya, name) == 1:
 						print(milgaya)
 		except :
 			continue
 
 
-getResLinks(url1)
+#Name of file to be searched - Search Term
+name = input("Enter a movie name : ")
+url = makeURL(name,ext1)
+getResLinks(url)
 getMovielink(sites)
 
-ask = input("Want more links? (Y/N)")
+ask = input("Want more links? (Y/N)").upper()
 if ask == 'Y':
 	googlekpages()
 	print(googleallpages)
