@@ -1,23 +1,43 @@
 # library imports
 from bs4 import *
 import requests
+import random
 
 # List to store Links from google search page
 sites = []
 movies = [] #List to store link of movies
 googleallpages = [] # List to store next 9 pages of google search
 
-# Browser Headers
-headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'}
+# List containing different browser user agents.
+headerlist = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
+		   "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36 OPR/43.0.2442.991",
+           "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36 OPR/42.0.2393.94",
+           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36 OPR/47.0.2631.39",
+           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36",
+           "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36",
+           "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36",
+           "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0",
+           "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0",
+           "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:56.0) Gecko/20100101 Firefox/56.0",
+           "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"]
+
+#Selecting a random user agent from the headerlist and saving it to header. This step is to prevent getting blocked from google search.
+user_agent = random.choice(headerlist)
+headers = {'User-Agent': user_agent}
+
+#Initializing variables with blank
+soup = ' '
+ext = ' '
 
 #File valid extensions (file links should end with these extensions)
 ext1 = ('mkv','mov','avi','mp4','mpg','wmv')
 ext2 = ('mp3','wav','ac3','ogg','flac','wma','m4a')
-ext3 = ('MOBI','CBZ','CBR','CBC','CHM','EPUB','FB2','LIT','LRF','ODT','PDF','PRC','PDB','PML','RB','RTF','TCR','DOC','DOCX')
+ext3 = ('MOBI','PDF','RTF','DOC','DOCX')
 ext4 = ('exe','iso','tar','rar','zip','apk')
 ext5 = ('jpg','png','bmp','gif','tif','tiff','psd')
+ext6 = ' '
 
-
+#Function to make URL from search term and file extensions.
 def makeURL(name,filetype):
 	# URL Prefix
 	urlPref = "https://www.google.com/search?q="
@@ -31,9 +51,6 @@ def makeURL(name,filetype):
 	url1 = urlPref + name + urlMid + FileExt + urlSuff
 	return url1
 
-
-#Initializing soup with blank
-soup = ' '
 
 #Function to find and append the websites on a google search page into sites[] list
 def getResLinks(url):
@@ -72,9 +89,9 @@ def match(filekalink, searchterm):
 	if set(searchterm.split(' ')).issubset(filekalink) :
 		return 1
 
-
+#Function to get the link of file from websites in sites[] list. 
 def getMovielink(websites):
-	print("~~~~~~~~~~~~~~~~~~~~~~~~ MOVIE LINKS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~ FILE LINKS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 	for site in websites:
 		if ((site.startswith("https://")) or (site.startswith("http://"))):
 			fullsitelink = site
@@ -87,8 +104,7 @@ def getMovielink(websites):
 			for movielink in alllinks:
 				movie = (movielink['href'])
 				milgaya = fullsitelink + movie
-				#if milgaya.endswith(('mkv','mov','avi','mp4','mpg','wmv')) : ----depricated
-				if milgaya.endswith(ext1) :
+				if milgaya.endswith(ext) :
 					if match(milgaya, name) == 1:
 						print(milgaya)
 		except :
@@ -96,12 +112,30 @@ def getMovielink(websites):
 
 
 #Name of file to be searched - Search Term
-name = input("Enter a movie name : ")
-url = makeURL(name,ext1)
+name = input("Enter file name : ")
+contenttype = input("\nEnter its type -\nPress : \n |- 1. Video, Movies, Clips, TV Shows, Documentaries \n |- 2. Music, Songs, Audio \n |- 3. E-books, PDFs, Document, Spreadsheets, Presentations \n |- 4. Softwares, Applications, Zip Folders, ISOs \n |- 5. Images, Photos, Albums, Graphics, GIFs, PSDs \n |- 6. Custom file type \n")
+if contenttype == '1':
+	ext = ext1
+elif contenttype == '2':
+	ext = ext2
+elif contenttype == '3':
+	ext = ext3
+elif contenttype == '4':
+	ext = ext4
+elif contenttype == '5':
+	ext = ext5
+elif contenttype == '6':
+	ext6 = input("\nEnter file extensions seperated by comma(,) -                 			For ex: txt,jpg,mp3\n\t")
+	ext6 = ext6.replace(',',' ')
+	ext6 = ext6.split(' ')
+	ext6 = tuple(ext6)
+	ext = ext6
+
+url = makeURL(name,ext)
 getResLinks(url)
 getMovielink(sites)
 
-ask = input("Want more links? (Y/N)").upper()
+ask = input("Want more links? (Y/N)\n").upper()
 if ask == 'Y':
 	googlekpages()
 	print(googleallpages)
