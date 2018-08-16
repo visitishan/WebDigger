@@ -74,9 +74,12 @@ def googlekpages():
 	for pages in nextpage:
 		pg = (pages['href'])
 		pg = 'http://google.com' + pg
-		flclasslinks.append(pg)
+		if "&start=" not in pg :
+			continue
+		else :
+			flclasslinks.append(pg)
 	global googleallpages
-	googleallpages = (flclasslinks[-9:])
+	googleallpages = flclasslinks
 
 #Function to check whether the Search term is present in final file link. It'll return 1 if matches else skip the link.
 def match(filekalink, searchterm):
