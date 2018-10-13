@@ -7,6 +7,8 @@ import random
 sites = []
 movies = [] #List to store link of movies
 googleallpages = [] # List to store next 9 pages of google search
+tempLinks = [] #List to store temporary result links from above list links
+
 
 # List containing different browser user agents.
 headerlist = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
@@ -114,9 +116,42 @@ def getMovielink(websites):
 			continue
 
 
+# Fetch further google results links and fetch more file links (with user input)-
+def moreLinks():
+
+	lStart = 11
+
+	for xCount in range(linkCount):
+		if(xCount < linkCount):
+			ask = input("\nWant more links? (Y/N) : ").upper()
+
+			if ask == 'Y':
+				getResLinks(googleallpages[xCount])
+						
+				for onesite in range(lStart,len(sites)):
+					tempLinks.append(sites[onesite]) 
+			
+
+				getMovielink(tempLinks)
+				tempLinks.clear()
+				lStart = lStart + 10
+			
+			elif ask == 'N':
+				print("\nThank you for using WebDigger !\n")
+				break
+
+			else:
+				print("\nInvalid Input !!!\n")
+			xCount = xCount + 1
+		else:
+			break
+
+
+
+
 #Name of file to be searched - Search Term
 name = input("Enter file name : ")
-contenttype = input("\nEnter its type -\nPress : \n |- 1. Video, Movies, Clips, TV Shows, Documentaries \n |- 2. Music, Songs, Audio \n |- 3. E-books, PDFs, Document, Spreadsheets, Presentations \n |- 4. Softwares, Applications, Zip Folders, ISOs \n |- 5. Images, Photos, Albums, Graphics, GIFs, PSDs \n |- 6. Custom file type \n")
+contenttype = input("\nEnter its type -\nPress : \n |- 1. Video, Movies, Clips, TV Shows, Documentaries \n |- 2. Music, Songs, Audio \n |- 3. E-books, PDFs, Document, Spreadsheets, Presentations \n |- 4. Softwares, Applications, Zip Folders, ISOs \n |- 5. Images, Photos, Albums, Graphics, GIFs, PSDs \n |- 6. Custom file type \n\tOption: ")
 if contenttype == '1':
 	ext = ext1
 elif contenttype == '2':
@@ -137,15 +172,9 @@ elif contenttype == '6':
 url = makeURL(name,ext)
 getResLinks(url)
 getMovielink(sites)
-
-ask = input("Want more links? (Y/N)\n").upper()
-if ask == 'Y':
-	googlekpages()
-	print(googleallpages)
-	for page in googleallpages:
-		getResLinks(page)
-	for onesite in sites:
-		getMovielink(sites)
+googlekpages()
+linkCount = len(googleallpages)
+moreLinks()
 
 
 
