@@ -7,7 +7,7 @@ import random
 sites = []
 movies = [] #List to store link of movies
 googleallpages = [] # List to store next 9 pages of google search
-tempLinks = [] #List to store temporary result links from above list links
+websitesFromCurrentSearchPage = [] #List to store temporary result links from above list links
 
 
 # List containing different browser user agents.
@@ -85,7 +85,7 @@ def googlekpages():
 
 #Function to check whether the Search term is present in final file link. It'll return 1 if matches else skip the link.
 def match(filekalink, searchterm):
-	delimiters = {'%20','%5','_','.','-','/',':','%','(',')','{','}','[',']'}
+	delimiters = {'%20','%5','_','.',',','-','/',':','%','(',')','{','}','[',']'}
 	filekalink = filekalink.lower()
 	searchterm = searchterm.lower()
 	for delimiter in delimiters:
@@ -116,36 +116,28 @@ def getMovielink(websites):
 			continue
 
 
-# Fetch further google results links and fetch more file links (with user input)-
-def moreLinks():
-
-	lStart = 11
-
+# Function to ask user for more results and bring results from next search pages.
+def moreLinks(linkCount):
+	#linkStart is the starting index for list of websites 
+	linkStart = 10
+	#loop works for next search pages from google search
 	for xCount in range(linkCount):
-		if(xCount < linkCount):
-			ask = input("\nWant more links? (Y/N) : ").upper()
+		ask = input("\nWant more links? (Y/N) : ").upper()
+		if ask == 'Y':
+			getResLinks(googleallpages[xCount])		#prints and appends websites of a particular search page to sites list.
+			# Here comes the tricky part. Everytime the getResLinks function is called, new websites are added to the sites list. Since 1-10 websites are already shown to the user, we start from 11th index.
+			for onesite in range(linkStart,len(sites)):
+				websitesFromCurrentSearchPage.append(sites[onesite]) 	# websitesFromCurrentSearchPage is a local temporary list that stores only 10 websites from current search page.
+			getMovielink(websitesFromCurrentSearchPage)
+			websitesFromCurrentSearchPage.clear()				# list cleared after use 
+			linkStart = linkStart + 10							# linkStart incremented by 10 so that next time it appends next 10 websites to the websitesFromCurrentSearchPage list
 
-			if ask == 'Y':
-				getResLinks(googleallpages[xCount])
-						
-				for onesite in range(lStart,len(sites)):
-					tempLinks.append(sites[onesite]) 
-			
-
-				getMovielink(tempLinks)
-				tempLinks.clear()
-				lStart = lStart + 10
-			
-			elif ask == 'N':
-				print("\nThank you for using WebDigger !\n")
-				break
-
-			else:
-				print("\nInvalid Input !!!\n")
-			xCount = xCount + 1
-		else:
+		elif ask == 'N':
+			print("\nThank you for using WebDigger !\n")
 			break
 
+		else:
+			print("\nInvalid Input !!!\n")
 
 
 
@@ -173,8 +165,6 @@ url = makeURL(name,ext)
 getResLinks(url)
 getMovielink(sites)
 googlekpages()
-linkCount = len(googleallpages)
-moreLinks()
-
-
+totalSearchPages = len(googleallpages)
+moreLinks(totalSearchPages)
 
