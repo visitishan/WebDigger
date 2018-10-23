@@ -2,7 +2,6 @@
 from bs4 import BeautifulSoup
 import requests
 from fake_useragent import UserAgent
-ua = UserAgent()
 from bannerfile import *
 
 # List to store Links from google search page
