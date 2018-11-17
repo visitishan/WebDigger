@@ -77,6 +77,7 @@ def match(filekalink, searchterm):
 	searchterm = searchterm.lower()
 	for delimiter in delimiters:
 		filekalink = filekalink.replace(delimiter,' ')
+		searchterm = searchterm.replace(delimiter,' ')
 	filekalink = filekalink.split(' ')
 	if set(searchterm.split(' ')).issubset(filekalink) :
 		return 1
