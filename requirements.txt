@@ -4,5 +4,5 @@ certifi==2018.8.24
 chardet==3.0.4
 fake-useragent==0.1.10
 idna==2.7
-requests==2.19.1
+requests>=2.20.0
 urllib3==1.23
