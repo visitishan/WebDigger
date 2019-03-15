@@ -23,6 +23,12 @@ python -m pip install -r requirements.txt
 python digfile.py
 ```
 
+- Docker
+```sh
+$ docker pull visitishan/webdigger
+$ docker run -ti visitishan/webdigger
+```
+
 
 
 ### Screenshots
